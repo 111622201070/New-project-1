@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Patient Care Analysis Outreach</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 80px; /* Space for the fixed search bar, matching login.html */
+            font-family: Arial, sans-serif;
+        }
+        header {
+            text-align: center;
+            padding: 20px;
+        }
+        .nav-buttons a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #007bff;
+            padding: 10px 20px; /* Matches arrow-button in login.html */
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        /* Removed :hover effect to eliminate "blue blur" */
+        .register-container {
+            max-width: 400px; /* Matches login-container implied width */
+            margin: 20px auto;
+            text-align: center;
+            position: relative;
+            z-index: 1; /* Above background image */
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left; /* Matches login.html */
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px; /* Matches login.html */
+            border: none; /* Removed small box */
+            border-bottom: 1px solid #007bff; /* Blue horizontal line */
+            border-radius: 0; /* Remove rounded corners for underline effect */
+            font-size: 16px;
+        }
+        .login-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .login-button:hover {
+            background-color: #0056b3; /* Matches login.html */
+        }
+        .reset-password {
+            margin-top: 10px; /* Matches login.html */
+        }
+        .reset-password a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .reset-password a:hover {
+            text-decoration: underline;
+        }
+        .search-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            width: 90%;
+            max-width: 600px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            z-index: 1000;
+        }
+        .search-bar {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc; /* Kept for search bar as in login.html */
+            border-radius: 4px;
+            font-size: 16px;
+            resize: none;
+            height: 40px;
+            margin-right: 10px;
+        }
+        .arrow-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .arrow-button:hover {
+            background-color: #0056b3; /* Matches login.html */
+        }
+        .background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            opacity: 1;
+        }
+        .flash-messages p {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .flash-messages .success { background-color: #dff0d8; color: #3c763d; }
+        .flash-messages .error { background-color: #f2dede; color: #a94442; }
+        footer {
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 1;
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>PATIENT CARE ANALYSIS OUTREACH</h1>
+        <nav class="nav-buttons">
+            <a href="{{ url_for('home') }}" class="button">Home</a>
+            {% if session.get('logged_in') %}
+                <a href="{{ url_for('logout') }}" class="button">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="button">Login</a>
+                <a href="{{ url_for('register') }}" class="button">Register</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <div class="register-container">
+        <h2>Register</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <p class="{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <form action="{{ url_for('register') }}" method="POST">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="mobile">Mobile Number:</label>
+                <input type="tel" id="mobile" name="mobile" placeholder="Enter your mobile number" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Create Password:</label>
+                <input type="password" id="password" name="password" placeholder="Create a password" required>
+            </div>
+            <div class="form-group">
+                <label for="verify_password">Verify Password:</label>
+                <input type="password" id="verify_password" name="verify_password" placeholder="Verify your password" required>
+            </div>
+            <button type="submit" class="login-button">Register</button>
+        </form>
+        <div class="reset-password">
+            <a href="{{ url_for('login') }}">Already have an account? Login</a>
+        </div>
+    </div>
+
+    {% if session.get('logged_in') %}
+    <div class="bottom-tab">
+        <div class="search-container">
+            <form action="{{ url_for('search') }}" method="GET">
+                <input type="text" name="query" placeholder="Type your symptoms..." class="search-bar">
+                <button type="submit" class="arrow-button">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <img src="{{ url_for('static', filename='bg.jpg') }}" alt="Background Image" class="background-image">
+    <footer>
+        © 2025 Techarmy. All rights reserved.
+    </footer>
+</body>
+</html>

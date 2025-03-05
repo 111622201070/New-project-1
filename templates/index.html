@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Care Analysis Outreach</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            position: relative;
+        }
+        .welcome-container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 20px;
+            color: #333;
+        }
+        #welcome-text {
+            white-space: pre-wrap;
+            font-size: 16px;
+            margin-top: 10px;
+            color: #000; /* Ensure text is visible */
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 1;
+            color: #000000;
+        }
+        .background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>PATIENT CARE ANALYSIS OUTREACH</h1>
+        <div class="nav-buttons">
+            <a href="{{ url_for('home') }}" class="button">Home</a>
+            {% if session.get('logged_in') %}
+                <a href="{{ url_for('logout') }}" class="button">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="button">Login</a>
+                <a href="{{ url_for('register') }}" class="button">Register</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="welcome-container">
+        <h2>Welcome to Patient Care Analysis Outreach</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="{{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <div id="welcome-text"></div>
+    </div>
+
+    <img src="{{ url_for('static', filename='bg.jpg') }}" alt="Background Image" class="background-image">
+
+    <footer>
+        © 2025 Techarmy. All rights reserved.
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const welcomeText = `We are dedicated to providing exceptional care.\n
+Our team at Techarmy is here to support your health needs.\n
+With cutting-edge analysis and outreach services,\n
+we aim to empower patients and caregivers alike.\n
+Explore a world of health insights tailored for you.\n
+Login to access symptom searches and more tools.\n
+Your well-being is our top priority every day.\n
+Join us in revolutionizing patient care today.\n
+Together, we can build a healthier tomorrow.\n
+Welcome aboard to Patient Care Analysis Outreach!`;
+
+            const welcomeElement = document.getElementById('welcome-text');
+            if (!welcomeElement) {
+                console.error("Element #welcome-text not found!");
+                return;
+            }
+
+            let i = 0;
+
+            function typeWriter() {
+                if (i < welcomeText.length) {
+                    welcomeElement.innerHTML += welcomeText.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 50);
+                } else {
+                    localStorage.setItem('welcomeTyped', 'true');
+                }
+            }
+
+            if (localStorage.getItem('welcomeTyped') === 'true') {
+                welcomeElement.innerHTML = welcomeText;
+            } else {
+                welcomeElement.innerHTML = '';
+                typeWriter();
+            }
+        });
+    </script>
+</body>
+</html>
