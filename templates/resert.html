@@ -6,6 +6,126 @@
     <title>Reset Password - Patient Care Analysis Outreach</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 80px; /* Space for the fixed search bar */
+            font-family: Arial, sans-serif;
+        }
+        header {
+            text-align: center;
+            padding: 20px;
+        }
+        .nav-buttons a {
+            margin: 0 10px;
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .reset-password-container {
+            max-width: 400px;
+            margin: 20px auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .login-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none; /* For resend link */
+            display: inline-block; /* For resend link */
+        }
+        .login-button:hover {
+            background-color: #0056b3;
+        }
+        .reset-password {
+            margin-top: 15px;
+        }
+        .reset-password a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .reset-password a:hover {
+            text-decoration: underline;
+        }
+        .resend-otp {
+            margin-bottom: 10px; /* Space between Resend OTP and Back to Login */
+        }
+        .background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            opacity: 1;
+        }
+        .search-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            width: 90%;
+            max-width: 600px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            z-index: 1000;
+        }
+        .search-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        .search-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .search-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -39,7 +159,12 @@
         </form>
         <p style="font-size: 14px; color: #666; margin-top: 10px;">Enter your email to receive a one-time password (OTP).</p>
         <div class="reset-password">
-            <a href="/login">Back to Login</a>
+            <div class="resend-otp">
+                <a href="#" class="login-button" id="resend-otp-link">Resend OTP</a>
+            </div>
+            <div>
+                <a href="/login">Back to Login</a>
+            </div>
         </div>
     </div>
 
@@ -58,15 +183,49 @@
 
     <img src="{{ url_for('static', filename='bg.jpg') }}" alt="Background Image" class="background-image">
 
-    <!-- JavaScript for Loading Indicator -->
+    <!-- JavaScript for Loading Indicator and Resend OTP -->
     <script>
         const resetForm = document.getElementById('reset-password-form');
         const resetButton = document.getElementById('reset-button');
+        const resendOtpLink = document.getElementById('resend-otp-link');
 
         if (resetForm && resetButton) {
             resetForm.addEventListener('submit', () => {
                 resetButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending OTP...';
                 resetButton.disabled = true;
+            });
+        }
+
+        if (resendOtpLink) {
+            resendOtpLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                const emailInput = document.getElementById('email').value;
+                if (!emailInput) {
+                    alert('Please enter your email first.');
+                    return;
+                }
+                resendOtpLink.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resending...';
+                resendOtpLink.style.pointerEvents = 'none'; // Disable further clicks
+
+                fetch('/reset-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'email=' + encodeURIComponent(emailInput)
+                })
+                .then(response => response.text())
+                .then(() => {
+                    resendOtpLink.innerHTML = 'Resend OTP';
+                    resendOtpLink.style.pointerEvents = 'auto';
+                    // Flash messages will handle success/error feedback
+                })
+                .catch(error => {
+                    console.error('Error resending OTP:', error);
+                    resendOtpLink.innerHTML = 'Resend OTP';
+                    resendOtpLink.style.pointerEvents = 'auto';
+                    alert('Failed to resend OTP. Please try again.');
+                });
             });
         }
     </script>
