@@ -84,6 +84,19 @@
         .verify-button:hover {
             background-color: #1565C0; /* Darker blue for hover */
         }
+        .resend-otp {
+            margin-top: 15px;
+            text-align: center;
+        }
+        .resend-otp a {
+            color: #1976D2; /* Matches button color */
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .resend-otp a:hover {
+            color: #1565C0; /* Darker blue on hover */
+            text-decoration: underline;
+        }
         /* Animation for Form Elements (matches login.html) */
         @keyframes fadeIn {
             0% {
@@ -148,10 +161,52 @@
                 </div>
                 <button type="submit" class="verify-button" aria-label="Verify OTP Button">Verify OTP</button>
             </form>
+
+            <!-- Resend OTP Link -->
+            <div class="resend-otp">
+                <a href="#" id="resend-otp-link">Resend OTP</a>
+            </div>
         </section>
     </main>
 
     <img src="{{ url_for('static', filename='bg.jpg') }}" alt="Background Image" class="background-image">
 
+    <!-- JavaScript for Resend OTP -->
+    <script>
+        const resendOtpLink = document.getElementById('resend-otp-link');
+
+        if (resendOtpLink) {
+            resendOtpLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                const email = "{{ email | safe }}"; // Get email from URL parameter
+                if (!email) {
+                    alert('Email not available. Please start the reset process again.');
+                    return;
+                }
+                resendOtpLink.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resending...';
+                resendOtpLink.style.pointerEvents = 'none'; // Disable further clicks
+
+                fetch('/reset-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'email=' + encodeURIComponent(email)
+                })
+                .then(response => response.text())
+                .then(() => {
+                    resendOtpLink.innerHTML = 'Resend OTP';
+                    resendOtpLink.style.pointerEvents = 'auto';
+                    // Flash messages will handle success/error feedback
+                })
+                .catch(error => {
+                    console.error('Error resending OTP:', error);
+                    resendOtpLink.innerHTML = 'Resend OTP';
+                    resendOtpLink.style.pointerEvents = 'auto';
+                    alert('Failed to resend OTP. Please try again.');
+                });
+            });
+        }
+    </script>
 </body>
 </html>
